@@ -229,41 +229,61 @@ class AlphabetScreen {
         this.game = game;
         this.currentIndex = 0;
         this.alphabets = [
-            { letter: 'A', word: 'Apple', description: 'A is for Apple' },
-            { letter: 'B', word: 'Ball', description: 'B is for Ball' },
-            { letter: 'C', word: 'Cat', description: 'C is for Cat' },
-            { letter: 'D', word: 'Dog', description: 'D is for Dog' },
-            { letter: 'E', word: 'Elephant', description: 'E is for Elephant' },
-            { letter: 'F', word: 'Fish', description: 'F is for Fish' },
-            { letter: 'G', word: 'Giraffe', description: 'G is for Giraffe' },
-            { letter: 'H', word: 'House', description: 'H is for House' },
-            { letter: 'I', word: 'Ice Cream', description: 'I is for Ice Cream' },
-            { letter: 'J', word: 'Jellyfish', description: 'J is for Jellyfish' },
-            { letter: 'K', word: 'Kite', description: 'K is for Kite' },
-            { letter: 'L', word: 'Lion', description: 'L is for Lion' },
-            { letter: 'M', word: 'Monkey', description: 'M is for Monkey' },
-            { letter: 'N', word: 'Nest', description: 'N is for Nest' },
-            { letter: 'O', word: 'Orange', description: 'O is for Orange' },
-            { letter: 'P', word: 'Penguin', description: 'P is for Penguin' },
-            { letter: 'Q', word: 'Queen', description: 'Q is for Queen' },
-            { letter: 'R', word: 'Rabbit', description: 'R is for Rabbit' },
-            { letter: 'S', word: 'Sun', description: 'S is for Sun' },
-            { letter: 'T', word: 'Tiger', description: 'T is for Tiger' },
-            { letter: 'U', word: 'Umbrella', description: 'U is for Umbrella' },
-            { letter: 'V', word: 'Violin', description: 'V is for Violin' },
-            { letter: 'W', word: 'Whale', description: 'W is for Whale' },
-            { letter: 'X', word: 'Xylophone', description: 'X is for Xylophone' },
-            { letter: 'Y', word: 'Yo-yo', description: 'Y is for Yo-yo' },
-            { letter: 'Z', word: 'Zebra', description: 'Z is for Zebra' }
+            { letter: 'A', word: 'Apple', description: 'A is for Apple', emoji: '🍎' },
+            { letter: 'B', word: 'Ball', description: 'B is for Ball', emoji: '🔴' },
+            { letter: 'C', word: 'Cat', description: 'C is for Cat', emoji: '🐱' },
+            { letter: 'D', word: 'Dog', description: 'D is for Dog', emoji: '🐕' },
+            { letter: 'E', word: 'Elephant', description: 'E is for Elephant', emoji: '🐘' },
+            { letter: 'F', word: 'Fish', description: 'F is for Fish', emoji: '🐟' },
+            { letter: 'G', word: 'Giraffe', description: 'G is for Giraffe', emoji: '🦒' },
+            { letter: 'H', word: 'House', description: 'H is for House', emoji: '🏠' },
+            { letter: 'I', word: 'Ice Cream', description: 'I is for Ice Cream', emoji: '🍦' },
+            { letter: 'J', word: 'Jellyfish', description: 'J is for Jellyfish', emoji: '🪼' },
+            { letter: 'K', word: 'Kite', description: 'K is for Kite', emoji: '🪁' },
+            { letter: 'L', word: 'Lion', description: 'L is for Lion', emoji: '🦁' },
+            { letter: 'M', word: 'Monkey', description: 'M is for Monkey', emoji: '🐵' },
+            { letter: 'N', word: 'Nest', description: 'N is for Nest', emoji: '🪺' },
+            { letter: 'O', word: 'Orange', description: 'O is for Orange', emoji: '🍊' },
+            { letter: 'P', word: 'Penguin', description: 'P is for Penguin', emoji: '🐧' },
+            { letter: 'Q', word: 'Queen', description: 'Q is for Queen', emoji: '👑' },
+            { letter: 'R', word: 'Rabbit', description: 'R is for Rabbit', emoji: '🐰' },
+            { letter: 'S', word: 'Sun', description: 'S is for Sun', emoji: '☀️' },
+            { letter: 'T', word: 'Tiger', description: 'T is for Tiger', emoji: '🐯' },
+            { letter: 'U', word: 'Umbrella', description: 'U is for Umbrella', emoji: '☂️' },
+            { letter: 'V', word: 'Violin', description: 'V is for Violin', emoji: '🎻' },
+            { letter: 'W', word: 'Whale', description: 'W is for Whale', emoji: '🐋' },
+            { letter: 'X', word: 'Xylophone', description: 'X is for Xylophone', emoji: '🎵' },
+            { letter: 'Y', word: 'Yo-yo', description: 'Y is for Yo-yo', emoji: '🎪' },
+            { letter: 'Z', word: 'Zebra', description: 'Z is for Zebra', emoji: '🦓' }
         ];
 
         this.backButton = new Button(20, 20, 120, 50, '← Back', COLORS.LIGHT_CORAL, COLORS.BLACK, 30);
         this.prevButton = new Button(50, 600, 150, 60, '← Previous', COLORS.LIGHT_GREEN, COLORS.BLACK, 30);
         this.nextButton = new Button(800, 600, 150, 60, 'Next →', COLORS.LIGHT_GREEN, COLORS.BLACK, 30);
+        this.speakButton = new Button(420, 350, 160, 50, '🔊 Say', COLORS.YELLOW, COLORS.BLACK, 30);
+    }
+
+    speak() {
+        const current = this.alphabets[this.currentIndex];
+        const text = `${current.letter} for ${current.word}`;
+        
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Create utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.8;
+        utterance.pitch = 1.2;
+        utterance.volume = 1;
+        
+        // Speak
+        window.speechSynthesis.speak(utterance);
     }
 
     reset() {
         this.currentIndex = 0;
+        // Auto-speak the first letter
+        setTimeout(() => this.speak(), 500);
     }
 
     draw(ctx, mousePos) {
@@ -291,10 +311,16 @@ class AlphabetScreen {
         ctx.textBaseline = 'middle';
         ctx.fillText(current.letter, CANVAS_WIDTH / 2, 250);
 
+        // Emoji image below letter
+        ctx.font = '100px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(current.emoji, CANVAS_WIDTH / 2, 380);
+
         // Description
         ctx.fillStyle = COLORS.BLACK;
         ctx.font = '40px Arial';
-        ctx.fillText(current.description, CANVAS_WIDTH / 2, 420);
+        ctx.fillText(current.description, CANVAS_WIDTH / 2, 430);
 
         // Word box
         ctx.fillStyle = COLORS.ORANGE;
@@ -314,6 +340,10 @@ class AlphabetScreen {
         ctx.font = '35px Arial';
         ctx.fillText(`${this.currentIndex + 1} / ${this.alphabets.length}`, CANVAS_WIDTH / 2, 100);
 
+        // Speak button
+        this.speakButton.updateHover(mousePos.x, mousePos.y);
+        this.speakButton.draw(ctx);
+
         // Navigation buttons
         this.prevButton.updateHover(mousePos.x, mousePos.y);
         this.nextButton.updateHover(mousePos.x, mousePos.y);
@@ -324,10 +354,16 @@ class AlphabetScreen {
     handleClick(x, y) {
         if (this.backButton.isClicked(x, y)) {
             this.game.changeMode(GameMode.MENU);
+        } else if (this.speakButton.isClicked(x, y)) {
+            this.speak();
         } else if (this.prevButton.isClicked(x, y)) {
             this.currentIndex = Math.max(0, this.currentIndex - 1);
+            // Auto-speak when changing to next/previous letter
+            setTimeout(() => this.speak(), 300);
         } else if (this.nextButton.isClicked(x, y)) {
             this.currentIndex = Math.min(this.alphabets.length - 1, this.currentIndex + 1);
+            // Auto-speak when changing to next/previous letter
+            setTimeout(() => this.speak(), 300);
         }
     }
 }
