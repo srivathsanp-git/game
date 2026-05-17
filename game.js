@@ -459,6 +459,49 @@ class QuizScreen {
         this.quizMode = 'alphabet';
         this.questions = [];
         this.backButton = new Button(20, 20, 120, 50, '← Back', COLORS.LIGHT_CORAL, COLORS.BLACK, 30);
+        this.feedbackMessage = '';
+        this.feedbackColor = COLORS.GREEN;
+        this.feedbackTimer = 0;
+        this.waitingForNext = false;
+        this.nextDelay = 0;
+        this.celebrationStars = [];
+    }
+
+    setFeedback(message, color, speechText) {
+        this.feedbackMessage = message;
+        this.feedbackColor = color;
+        this.feedbackTimer = 120;
+        if (speechText && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    createCelebration() {
+        this.celebrationStars = [];
+        for (let i = 0; i < 20; i++) {
+            this.celebrationStars.push({
+                x: 200 + Math.random() * 600,
+                y: 250 + Math.random() * 200,
+                size: 8 + Math.random() * 10,
+                angle: Math.random() * Math.PI * 2,
+                speed: 1 + Math.random() * 2,
+                color: [COLORS.YELLOW, COLORS.ORANGE, COLORS.PINK, COLORS.GREEN][Math.floor(Math.random() * 4)]
+            });
+        }
+    }
+
+    advanceQuestion() {
+        this.currentQuestion += 1;
+        this.feedbackMessage = '';
+        this.waitingForNext = false;
+        this.nextDelay = 0;
+        if (this.currentQuestion >= this.totalQuestions) {
+            this.currentQuestion = this.totalQuestions;
+        }
     }
 
     reset() {
@@ -513,6 +556,17 @@ class QuizScreen {
     }
 
     draw(ctx, mousePos) {
+        if (this.feedbackTimer > 0) {
+            this.feedbackTimer -= 1;
+        }
+
+        if (this.waitingForNext) {
+            this.nextDelay -= 1;
+            if (this.nextDelay <= 0) {
+                this.advanceQuestion();
+            }
+        }
+
         this.backButton.updateHover(mousePos.x, mousePos.y);
         this.backButton.draw(ctx);
 
@@ -555,6 +609,23 @@ class QuizScreen {
         ctx.font = 'bold 40px Arial';
         ctx.textAlign = 'right';
         ctx.fillText(`Score: ${this.score}`, CANVAS_WIDTH - 50, 100);
+
+        if (this.feedbackMessage) {
+            ctx.fillStyle = this.feedbackColor;
+            ctx.font = 'bold 45px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(this.feedbackMessage, CANVAS_WIDTH / 2, 300);
+        }
+
+        if (this.waitingForNext && this.celebrationStars.length) {
+            this.celebrationStars.forEach(star => {
+                star.y -= star.speed;
+                star.x += Math.cos(star.angle) * star.speed;
+                ctx.fillStyle = star.color;
+                ctx.font = `${star.size}px Arial`;
+                ctx.fillText('★', star.x, star.y);
+            });
+        }
     }
 
     drawResults(ctx, mousePos) {
@@ -602,7 +673,8 @@ class QuizScreen {
 
         const question = this.questions[this.currentQuestion];
         const colors = [COLORS.PURPLE, COLORS.ORANGE, COLORS.PINK, COLORS.GREEN];
-        
+        let clickedCorrect = false;
+
         question.options.forEach((option, i) => {
             const btnX = 150 + (i % 2) * 400;
             const btnY = 350 + Math.floor(i / 2) * 120;
@@ -610,11 +682,22 @@ class QuizScreen {
             
             if (btn.isClicked(x, y)) {
                 if (option === question.correct) {
+                    clickedCorrect = true;
                     this.score++;
+                    this.setFeedback('Great! Correct!', COLORS.GREEN, 'Correct!');
+                    this.waitingForNext = true;
+                    this.nextDelay = 60;
+                    this.createCelebration();
+                } else {
+                    this.setFeedback('Wrong answer. Try again.', COLORS.RED, 'Wrong answer. Try again.');
                 }
-                this.currentQuestion++;
             }
         });
+
+        if (clickedCorrect && !this.waitingForNext) {
+            this.waitingForNext = true;
+            this.nextDelay = 60;
+        }
     }
 }
 
